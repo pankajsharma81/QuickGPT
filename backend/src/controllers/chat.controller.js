@@ -15,6 +15,7 @@ async function createChat(req, res) {
       _id: chat._id,
       title: chat.title,
       lastActivity: chat.lastActivity,
+      user:chat.user
     },
   });
 }
