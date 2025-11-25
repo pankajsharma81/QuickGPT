@@ -14,10 +14,11 @@ async function authMiddleware(req, res, next) {
     const user = await UserModel.findById(decoded.id);
     req.user = user;
     next();
-
   } catch (error) {
     res.status(401).json({
       message: "Invalid token, Please login again",
     });
   }
 }
+
+module.exports = { authMiddleware };
