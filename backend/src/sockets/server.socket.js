@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const UserModel = require("../models/user.model");
 const { generateResponse, generateVector } = require("../services/ai.service");
 const messageModel = require("../models/message.model");
-const { createMemory } = require("../services/vector.service");
+const { createMemory, queryMemory } = require("../services/vector.service");
 
 function initSocketServer(httpServer) {
   const io = new Server(httpServer, {});
@@ -55,6 +55,13 @@ function initSocketServer(httpServer) {
         },
       });
 
+      const responseMemory = await queryMemory({
+        queryVector:vectors,
+        limit: 3,
+        metadata: {},
+      });
+      console.log("responseMemory", responseMemory);
+
       const chatHistory = (
         await messageModel
           .find({
@@ -73,7 +80,6 @@ function initSocketServer(httpServer) {
           };
         })
       );
-      
 
       const responseMessage = await messageModel.create({
         user: socket.user._id,
@@ -86,13 +92,13 @@ function initSocketServer(httpServer) {
 
       await createMemory({
         vectors: responseVectors,
-        messageId:responseMessage._id,
-        metadata:{
-          chat:messagePayload.chat,
-          user:socket.user._id,
-          message:response,
-        }
-      })
+        messageId: responseMessage._id,
+        metadata: {
+          chat: messagePayload.chat,
+          user: socket.user._id,
+          message: response,
+        },
+      });
 
       socket.emit("ai-response", {
         content: response,
