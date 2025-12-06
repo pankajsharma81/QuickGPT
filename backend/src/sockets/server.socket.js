@@ -35,15 +35,15 @@ function initSocketServer(httpServer) {
       // messagePayload = { chat:chatId, content:messageContent }
       console.log(messagePayload);
 
-      const message = await messageModel.create({
-        user: socket.user._id,
-        chat: messagePayload.chat,
-        content: messagePayload.content,
-        role: "user",
-      });
-
-      const vectors = await generateVector(messagePayload.content);
-      // console.log("vectors generated", vectors);
+      const [message, vectors] = await Promise.all([
+        messageModel.create({
+          user: socket.user._id,
+          chat: messagePayload.chat,
+          content: messagePayload.content,
+          role: "user",
+        }),
+        generateVector(messagePayload.content),
+      ]);
 
       await createMemory({
         vectors,
@@ -55,27 +55,23 @@ function initSocketServer(httpServer) {
         },
       });
 
-      const memory = await queryMemory({
-        queryVector: vectors,
-        limit: 3,
-        // metadata: {
-        //   user: socket.user._id,
-        // },
-        filter: {
-          user: socket.user._id.toString(),
-        },
-      });
-      console.log("memory", memory);
-
-      const chatHistory = (
-        await messageModel
+      const [memory, chatHistory] = await Promise.all([
+        await queryMemory({
+          queryVector: vectors,
+          limit: 3,
+          metadata: {
+            user: socket.user._id,
+          },
+        }),
+        messageModel
           .find({
             chat: messagePayload.chat,
           })
           .sort({ createdAt: -1 })
           .limit(20)
           .lean()
-      ).reverse();
+          .then((msgs) => msgs.reverse()),
+      ]);
 
       const stm = chatHistory.map((msg) => {
         return {
@@ -102,14 +98,21 @@ function initSocketServer(httpServer) {
 
       const response = await generateResponse([...ltm, ...stm]);
 
-      const responseMessage = await messageModel.create({
-        user: socket.user._id,
-        chat: messagePayload.chat,
+      // Emit the AI response back to the client
+      socket.emit("ai-response", {
         content: response,
-        role: "model",
+        chat: messagePayload.chat,
       });
 
-      const responseVectors = await generateVector(response);
+      const [responseMessage, responseVectors] = await Promise.all([
+        messageModel.create({
+          user: socket.user._id,
+          chat: messagePayload.chat,
+          content: response,
+          role: "model",
+        }),
+        generateVector(response),
+      ]);
 
       await createMemory({
         vectors: responseVectors,
@@ -120,11 +123,7 @@ function initSocketServer(httpServer) {
           message: response,
         },
       });
-
-      socket.emit("ai-response", {
-        content: response,
-        chat: messagePayload.chat,
-      });
+      
     });
   });
 }
