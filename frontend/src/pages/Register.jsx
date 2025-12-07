@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useSystemTheme } from "../hooks/useSystemTheme";
 import "../styles/Auth.css";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Register = () => {
   useSystemTheme();
@@ -11,6 +13,8 @@ const Register = () => {
     lastName: "",
     password: "",
   });
+  const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,10 +24,40 @@ const Register = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Register Data:", formData);
-    // Handle registration logic here
+
+    setSubmitting(true);
+
+    try {
+      await axios
+        .post(
+          "http://localhost:3000/api/auth/register",
+          {
+            email: formData.email,
+            fullName: {
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+            },
+            password: formData.password,
+          },
+          {
+            withCredentials: true,
+          }
+        )
+        .then((res) => {
+          console.log(res);
+          navigate("/login");
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+        .finally(() => {
+          setSubmitting(false);
+        });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
