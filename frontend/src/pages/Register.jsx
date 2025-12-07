@@ -1,7 +1,10 @@
 import React, { useState } from "react";
+import { useSystemTheme } from "../hooks/useSystemTheme";
 import "../styles/Auth.css";
 
 const Register = () => {
+  useSystemTheme();
+
   const [formData, setFormData] = useState({
     email: "",
     firstName: "",
