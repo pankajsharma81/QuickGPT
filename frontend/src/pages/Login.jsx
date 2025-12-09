@@ -3,6 +3,7 @@ import { useSystemTheme } from "../hooks/useSystemTheme";
 import "../styles/Auth.css";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { RiRobot2Line } from "react-icons/ri";
 
 const Login = () => {
   useSystemTheme();
@@ -50,7 +51,14 @@ const Login = () => {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h1>Login</h1>
+        <div className="auth-logo">
+          <div className="auth-logo-icon">
+            <RiRobot2Line size={48} />
+          </div>
+        </div>
+        <h1>Welcome back</h1>
+        <p className="auth-subtitle">Sign in to continue to QuickGPT</p>
+        
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="email">Email</label>
@@ -78,13 +86,13 @@ const Login = () => {
             />
           </div>
 
-          <button type="submit" className="submit-btn">
-            Login
+          <button type="submit" className="submit-btn" disabled={submitting}>
+            {submitting ? "Signing in..." : "Sign in"}
           </button>
         </form>
 
         <p className="auth-link">
-          Don't have an account? <a href="/register">Register here</a>
+          Don't have an account? <Link to="/register">Create account</Link>
         </p>
       </div>
     </div>
