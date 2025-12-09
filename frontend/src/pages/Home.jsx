@@ -1,68 +1,118 @@
-import React from "react";
-import { useSystemTheme } from "../hooks/useSystemTheme";
-import "../styles/Home.css";
+import React, { useState } from 'react'
+import '../styles/Home.css'
+import ChatSidebar from '../components/home/ChatSidebar'
+import ChatScreen from '../components/home/ChatScreen'
 
 const Home = () => {
-  useSystemTheme();
+  const [messages, setMessages] = useState([])
+  const [userInput, setUserInput] = useState('')
+  const [previousChats, setPreviousChats] = useState([
+    { id: 'chat-1', title: 'Welcome chat' }
+  ])
+  const [activeChatId, setActiveChatId] = useState('chat-1')
+  const [isSending, setIsSending] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen)
+
+  const handleSendMessage = async (e) => {
+    e.preventDefault()
+    const trimmed = userInput.trim()
+    if (!trimmed || isSending) return
+
+    const userMessage = {
+      id: Date.now(),
+      sender: 'user',
+      text: trimmed
+    }
+
+    setMessages((prev) => [...prev, userMessage])
+    setUserInput('')
+    setIsSending(true)
+
+    try {
+      // TODO: replace this with real API call to your backend
+      // Example:
+      // const res = await fetch('/api/chat', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ message: trimmed, chatId: activeChatId })
+      // })
+      // const data = await res.json()
+      // const aiText = data?.reply || 'Something went wrong, please try again.'
+
+      const fakeAiReply = `You said: "${trimmed}"`
+
+      const aiMessage = {
+        id: Date.now() + 1,
+        sender: 'ai',
+        text: fakeAiReply
+      }
+
+      setMessages((prev) => [...prev, aiMessage])
+    } catch {
+      const errorMessage = {
+        id: Date.now() + 2,
+        sender: 'ai',
+        text: 'Sorry, something went wrong. Please try again.'
+      }
+      setMessages((prev) => [...prev, errorMessage])
+    } finally {
+      setIsSending(false)
+    }
+  }
+
+  const handleNewChat = () => {
+    const newId = `chat-${Date.now()}`
+    const newChat = {
+      id: newId,
+      title: 'New chat'
+    }
+    setPreviousChats((prev) => [newChat, ...prev])
+    setActiveChatId(newId)
+    setMessages([])
+  }
+
+  const handleSelectChat = (chatId) => {
+    setActiveChatId(chatId)
+    // In a real app you would load this chat's messages from backend here
+    setMessages([])
+  }
 
   return (
     <div className="home-container">
-      <header className="home-header">
-        <div className="header-content">
-          <h1 className="logo">QuickGPT</h1>
-          <nav className="nav-links">
-            <a href="/login" className="nav-link">Login</a>
-            <a href="/register" className="nav-link nav-link-primary">Register</a>
-          </nav>
-        </div>
-      </header>
+      {/* Mobile sidebar overlay */}
+      {isSidebarOpen && (
+        <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />
+      )}
 
+      {/* Main chat layout */}
       <main className="home-main">
-        <section className="hero-section">
-          <div className="hero-content">
-            <h2 className="hero-title">Welcome to QuickGPT</h2>
-            <p className="hero-subtitle">
-              Fast, seamless, and intelligent. Your AI assistant powered by cutting-edge technology.
-            </p>
-            <div className="hero-buttons">
-              <a href="/register" className="btn btn-primary">Get Started</a>
-              <a href="/login" className="btn btn-secondary">Sign In</a>
-            </div>
-          </div>
-          <div className="hero-image">
-            <div className="gradient-box"></div>
-          </div>
-        </section>
+        <div className="chat-layout">
+          <ChatSidebar
+            previousChats={previousChats}
+            activeChatId={activeChatId}
+            onNewChat={handleNewChat}
+            onSelectChat={(chatId) => {
+              handleSelectChat(chatId)
+              setIsSidebarOpen(false)
+            }}
+            isOpen={isSidebarOpen}
+            onClose={() => setIsSidebarOpen(false)}
+          />
 
-        <section className="features-section">
-          <h2 className="section-title">Features</h2>
-          <div className="features-grid">
-            <div className="feature-card">
-              <div className="feature-icon">⚡</div>
-              <h3 className="feature-title">Fast & Responsive</h3>
-              <p className="feature-description">Lightning-quick responses powered by modern technology</p>
-            </div>
-
-            <div className="feature-card">
-              <div className="feature-icon">🔒</div>
-              <h3 className="feature-title">Secure & Private</h3>
-              <p className="feature-description">Your data is encrypted and protected with industry standards</p>
-            </div>
-
-            <div className="feature-card">
-              <div className="feature-icon">🎨</div>
-              <h3 className="feature-title">Beautiful Design</h3>
-              <p className="feature-description">Seamless user experience across all devices</p>
-            </div>
-          </div>
-        </section>
+          <ChatScreen
+            messages={messages}
+            userInput={userInput}
+            isSending={isSending}
+            onChangeInput={setUserInput}
+            onSend={handleSendMessage}
+            onMenuClick={toggleSidebar}
+          />
+        </div>
       </main>
-
-      <footer className="home-footer">
-        <p>&copy; 2025 QuickGPT. All rights reserved.</p>
-      </footer>
     </div>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home
