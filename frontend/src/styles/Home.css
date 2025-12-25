@@ -280,6 +280,15 @@
   overflow: hidden;
 }
 
+.chat-error-banner {
+  margin: 8px 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background-color: #7f1d1d;
+  color: #fecaca;
+  font-size: 0.875rem;
+}
+
 /* Welcome view - empty state */
 .welcome-view {
   flex: 1;

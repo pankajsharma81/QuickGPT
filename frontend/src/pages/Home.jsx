@@ -1,17 +1,86 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import '../styles/Home.css'
 import ChatSidebar from '../components/home/ChatSidebar'
 import ChatScreen from '../components/home/ChatScreen'
+import { getHistory, getChats, createChat } from '../api/chatApi'
+import { socket } from '../sockets/socketClient'
 
 const Home = () => {
   const [messages, setMessages] = useState([])
   const [userInput, setUserInput] = useState('')
-  const [previousChats, setPreviousChats] = useState([
-    { id: 'chat-1', title: 'Welcome chat' }
-  ])
-  const [activeChatId, setActiveChatId] = useState('chat-1')
+  const [previousChats, setPreviousChats] = useState([])
+  const [activeChatId, setActiveChatId] = useState(null)
   const [isSending, setIsSending] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    const initChatsAndHistory = async () => {
+      try {
+        setError('')
+
+        const chatsData = await getChats()
+        const chats = Array.isArray(chatsData?.chats) ? chatsData.chats : []
+
+        const mappedChats = chats.map((chat) => ({
+          id: chat._id,
+          title: chat.title || 'New chat'
+        }))
+        setPreviousChats(mappedChats)
+
+        const firstChatId = mappedChats[0]?._id || mappedChats[0]?.id
+        if (firstChatId) {
+          setActiveChatId(firstChatId)
+
+          const historyData = await getHistory(firstChatId)
+          if (Array.isArray(historyData?.messages)) {
+            const mappedMessages = historyData.messages.map((m) => ({
+              id: m.id,
+              sender: m.role === 'model' ? 'ai' : 'user',
+              text: m.content
+            }))
+            setMessages(mappedMessages)
+          }
+        }
+      } catch (err) {
+        console.error('QuickGPT initial load error', err)
+        setError('QuickGPT could not load your chats. Please try again.')
+      }
+    }
+
+    initChatsAndHistory()
+  }, [])
+
+  useEffect(() => {
+    const handleAiResponse = (payload) => {
+      const aiMessage = {
+        id: Date.now(),
+        sender: 'ai',
+        text:
+          payload?.content ||
+          'QuickGPT is having trouble responding right now. Please try again.'
+      }
+
+      setMessages((prev) => [...prev, aiMessage])
+      setIsSending(false)
+    }
+
+    const handleAiError = (payload) => {
+      setError(
+        payload?.message ||
+          'QuickGPT could not process your message. Please try again.'
+      )
+      setIsSending(false)
+    }
+
+    socket.on('ai-response', handleAiResponse)
+    socket.on('ai-error', handleAiError)
+
+    return () => {
+      socket.off('ai-response', handleAiResponse)
+      socket.off('ai-error', handleAiError)
+    }
+  }, [])
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen)
 
@@ -29,28 +98,16 @@ const Home = () => {
     setMessages((prev) => [...prev, userMessage])
     setUserInput('')
     setIsSending(true)
+    setError('')
 
     try {
-      // TODO: replace this with real API call to your backend
-      // Example:
-      // const res = await fetch('/api/chat', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ message: trimmed, chatId: activeChatId })
-      // })
-      // const data = await res.json()
-      // const aiText = data?.reply || 'Something went wrong, please try again.'
-
-      const fakeAiReply = `You said: "${trimmed}"`
-
-      const aiMessage = {
-        id: Date.now() + 1,
-        sender: 'ai',
-        text: fakeAiReply
-      }
-
-      setMessages((prev) => [...prev, aiMessage])
-    } catch {
+      socket.emit('ai-message', {
+        chat: activeChatId || undefined,
+        content: trimmed
+      })
+    } catch (err) {
+      console.error('QuickGPT sendMessage error', err)
+      setError('QuickGPT could not process your message. Please try again.')
       const errorMessage = {
         id: Date.now() + 2,
         sender: 'ai',
@@ -63,20 +120,53 @@ const Home = () => {
   }
 
   const handleNewChat = () => {
-    const newId = `chat-${Date.now()}`
-    const newChat = {
-      id: newId,
-      title: 'New chat'
+    const create = async () => {
+      try {
+        setError('')
+        const data = await createChat('New chat')
+        const chat = data?.chat
+        if (!chat?._id) return
+
+        const newChat = {
+          id: chat._id,
+          title: chat.title || 'New chat'
+        }
+
+        setPreviousChats((prev) => [newChat, ...prev])
+        setActiveChatId(newChat.id)
+        setMessages([])
+      } catch (err) {
+        console.error('QuickGPT createChat error', err)
+        setError('QuickGPT could not create a new chat. Please try again.')
+      }
     }
-    setPreviousChats((prev) => [newChat, ...prev])
-    setActiveChatId(newId)
-    setMessages([])
+
+    create()
   }
 
   const handleSelectChat = (chatId) => {
     setActiveChatId(chatId)
-    // In a real app you would load this chat's messages from backend here
     setMessages([])
+
+    const loadHistoryForChat = async () => {
+      try {
+        setError('')
+        const data = await getHistory(chatId)
+        if (Array.isArray(data?.messages)) {
+          const mapped = data.messages.map((m) => ({
+            id: m.id,
+            sender: m.role === 'model' ? 'ai' : 'user',
+            text: m.content
+          }))
+          setMessages(mapped)
+        }
+      } catch (err) {
+        console.error('QuickGPT getHistory error', err)
+        setError('QuickGPT could not load this chat history.')
+      }
+    }
+
+    loadHistoryForChat()
   }
 
   return (
@@ -108,6 +198,7 @@ const Home = () => {
             onChangeInput={setUserInput}
             onSend={handleSendMessage}
             onMenuClick={toggleSidebar}
+            error={error}
           />
         </div>
       </main>

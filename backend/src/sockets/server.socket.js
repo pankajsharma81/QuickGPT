@@ -20,13 +20,18 @@ function initSocketServer(httpServer) {
     const cookies = cookie.parse(socket.handshake.headers?.cookie || "");
 
     if (!cookies.token) {
-      next(new Error("Authentication error : No token provided"));
+      return next(new Error("Authentication error : No token provided"));
     }
 
     try {
       const decoded = jwt.verify(cookies.token, process.env.JWT_SECRET);
-
       const user = await UserModel.findById(decoded.id);
+
+      if (!user) {
+        return next(
+          new Error("Authentication error : User not found for this token")
+        );
+      }
 
       socket.user = user;
 
@@ -38,6 +43,12 @@ function initSocketServer(httpServer) {
 
   io.on("connection", (socket) => {
     socket.on("ai-message", async (messagePayload) => {
+      if (!socket.user) {
+        socket.emit("ai-error", {
+          message: "You are not authenticated. Please log in again.",
+        });
+        return;
+      }
       // messagePayload = { chat:chatId, content:messageContent }
       console.log(messagePayload);
 

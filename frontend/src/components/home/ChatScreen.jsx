@@ -4,7 +4,7 @@ import { FiMenu, FiSun, FiZap, FiAlertTriangle } from 'react-icons/fi'
 import ChatMessages from './ChatMessages'
 import ChatInputBar from './ChatInputBar'
 
-const ChatScreen = ({ messages, userInput, isSending, onChangeInput, onSend, onMenuClick }) => {
+const ChatScreen = ({ messages, userInput, isSending, onChangeInput, onSend, onMenuClick, error }) => {
   const hasMessages = messages.length > 0
 
   return (
@@ -95,6 +95,11 @@ const ChatScreen = ({ messages, userInput, isSending, onChangeInput, onSend, onM
               </div>
             </div>
           </div>
+        </div>
+      )}
+      {error && (
+        <div className="chat-error-banner">
+          {error}
         </div>
       )}
       <ChatInputBar
