@@ -13,6 +13,7 @@ const Home = () => {
   const [previousChats, setPreviousChats] = useState([])
   const [activeChatId, setActiveChatId] = useState(null)
   const [isSending, setIsSending] = useState(false)
+  const [isGenerating, setIsGenerating] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [error, setError] = useState('')
   const navigate = useNavigate()
@@ -66,6 +67,7 @@ const Home = () => {
 
       setMessages((prev) => [...prev, aiMessage])
       setIsSending(false)
+      setIsGenerating(false)
     }
 
     const handleAiError = (payload) => {
@@ -74,6 +76,7 @@ const Home = () => {
           'QuickGPT could not process your message. Please try again.'
       )
       setIsSending(false)
+      setIsGenerating(false)
     }
 
     socket.on('ai-response', handleAiResponse)
@@ -126,6 +129,7 @@ const Home = () => {
     })
     setUserInput('')
     setIsSending(true)
+    setIsGenerating(true)
     setError('')
 
     try {
@@ -144,6 +148,7 @@ const Home = () => {
       setMessages((prev) => [...prev, errorMessage])
     } finally {
       setIsSending(false)
+      setIsGenerating(false)
     }
   }
 
@@ -237,6 +242,7 @@ const Home = () => {
             messages={messages}
             userInput={userInput}
             isSending={isSending}
+            isGenerating={isGenerating}
             onChangeInput={setUserInput}
             onSend={handleSendMessage}
             onMenuClick={toggleSidebar}

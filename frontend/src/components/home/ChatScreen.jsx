@@ -4,7 +4,7 @@ import { FiMenu, FiSun, FiZap, FiAlertTriangle, FiInfo, FiSettings } from 'react
 import ChatMessages from './ChatMessages'
 import ChatInputBar from './ChatInputBar'
 
-const ChatScreen = ({ messages, userInput, isSending, onChangeInput, onSend, onMenuClick, error }) => {
+const ChatScreen = ({ messages, userInput, isSending, isGenerating, onChangeInput, onSend, onMenuClick, error }) => {
   const hasMessages = messages.length > 0
 
   return (
@@ -28,7 +28,7 @@ const ChatScreen = ({ messages, userInput, isSending, onChangeInput, onSend, onM
               </button>
             </div>
           </header>
-          <ChatMessages messages={messages} />
+          <ChatMessages messages={messages} isGenerating={isGenerating} />
         </>
       ) : (
         // Landing view - QuickGPT start screen

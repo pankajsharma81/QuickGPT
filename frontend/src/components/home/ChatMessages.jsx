@@ -3,7 +3,7 @@ import { RiRobot2Line } from 'react-icons/ri'
 import { HiOutlineUser } from 'react-icons/hi'
 import ReactMarkdown from 'react-markdown'
 
-const ChatMessages = ({ messages }) => {
+const ChatMessages = ({ messages, isGenerating = false }) => {
   const formatTime = (value) => {
     if (!value) return ''
     const date = new Date(value)
@@ -53,6 +53,26 @@ const ChatMessages = ({ messages }) => {
           </div>
         )
       })}
+
+      {isGenerating && (
+        <div className="chat-message-row chat-message-ai">
+          <div className="chat-avatar chat-avatar-ai">
+            <RiRobot2Line size={18} />
+          </div>
+          <div className="chat-bubble-wrapper">
+            <div className="chat-message-bubble typing-bubble">
+              <div className="typing-indicator">
+                <span className="typing-dots">
+                  <span className="typing-dot" />
+                  <span className="typing-dot" />
+                  <span className="typing-dot" />
+                </span>
+                <span className="typing-text">Generating...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
