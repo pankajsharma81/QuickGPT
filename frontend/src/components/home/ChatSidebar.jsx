@@ -1,7 +1,7 @@
 import React from 'react'
 import { FiEdit, FiSun, FiExternalLink, FiLogOut, FiX } from 'react-icons/fi'
 import { IoChatbubbleOutline } from 'react-icons/io5'
-import { FaDiscord } from 'react-icons/fa'
+import { FaGithub } from 'react-icons/fa'
 
 const ChatSidebar = ({ previousChats, activeChatId, onNewChat, onSelectChat, onLogout, isOpen, onClose }) => {
   return (
@@ -44,9 +44,9 @@ const ChatSidebar = ({ previousChats, activeChatId, onNewChat, onSelectChat, onL
           <FiSun size={16} className="sidebar-icon" />
           <span>Light mode</span>
         </button>
-        <button className="sidebar-footer-item" type="button">
-          <FaDiscord size={16} className="sidebar-icon" />
-          <span>Discord</span>
+        <button className="sidebar-footer-item" type="button" onClick={() => window.open('https://github.com/pankajsharma81/QuickGPT', '_blank')}>
+          <FaGithub size={16} className="sidebar-icon" />
+          <span>GitHub</span>
         </button>
         <button className="sidebar-footer-item" type="button">
           <FiExternalLink size={16} className="sidebar-icon" />
