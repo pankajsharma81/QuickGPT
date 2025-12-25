@@ -1,6 +1,7 @@
 import React from 'react'
 import { RiRobot2Line } from 'react-icons/ri'
 import { HiOutlineUser } from 'react-icons/hi'
+import ReactMarkdown from 'react-markdown'
 
 const ChatMessages = ({ messages }) => {
   const formatTime = (value) => {
@@ -29,7 +30,15 @@ const ChatMessages = ({ messages }) => {
 
             <div className="chat-bubble-wrapper">
               <div className="chat-message-bubble">
-                {msg.text}
+                {isUser ? (
+                  msg.text
+                ) : (
+                  <div>
+                    <ReactMarkdown>
+                      {msg.text || ''}
+                    </ReactMarkdown>
+                  </div>
+                )}
               </div>
               {time && (
                 <div className="chat-message-meta">{time}</div>
