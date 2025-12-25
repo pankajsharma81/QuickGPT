@@ -1,7 +1,7 @@
 import React from 'react'
-import { FiEdit, FiSearch, FiX } from 'react-icons/fi'
+import { FiEdit, FiSun, FiExternalLink, FiLogOut, FiX } from 'react-icons/fi'
 import { IoChatbubbleOutline } from 'react-icons/io5'
-import { HiOutlineUser } from 'react-icons/hi'
+import { FaDiscord } from 'react-icons/fa'
 
 const ChatSidebar = ({ previousChats, activeChatId, onNewChat, onSelectChat, isOpen, onClose }) => {
   return (
@@ -11,15 +11,11 @@ const ChatSidebar = ({ previousChats, activeChatId, onNewChat, onSelectChat, isO
         <FiX size={20} />
       </button>
 
-      {/* Top navigation */}
+      {/* Top - new chat */}
       <nav className="sidebar-nav">
-        <button className="sidebar-nav-item" onClick={onNewChat}>
+        <button className="sidebar-nav-item" type="button" onClick={onNewChat}>
           <FiEdit size={16} className="sidebar-icon" />
-          <span>New chat</span>
-        </button>
-        <button className="sidebar-nav-item">
-          <FiSearch size={16} className="sidebar-icon" />
-          <span>Search chats</span>
+          <span>New Chat</span>
         </button>
       </nav>
 
@@ -42,14 +38,24 @@ const ChatSidebar = ({ previousChats, activeChatId, onNewChat, onSelectChat, isO
         </div>
       </div>
 
-      {/* Bottom user section */}
+      {/* Bottom quick actions */}
       <div className="sidebar-footer">
-        <div className="sidebar-user">
-          <span className="user-avatar">
-            <HiOutlineUser size={16} />
-          </span>
-          <span className="user-name">User</span>
-        </div>
+        <button className="sidebar-footer-item" type="button">
+          <FiSun size={16} className="sidebar-icon" />
+          <span>Light mode</span>
+        </button>
+        <button className="sidebar-footer-item" type="button">
+          <FaDiscord size={16} className="sidebar-icon" />
+          <span>Discord</span>
+        </button>
+        <button className="sidebar-footer-item" type="button">
+          <FiExternalLink size={16} className="sidebar-icon" />
+          <span>Updates &amp; FAQ</span>
+        </button>
+        <button className="sidebar-footer-item" type="button">
+          <FiLogOut size={16} className="sidebar-icon" />
+          <span>Log out</span>
+        </button>
       </div>
     </aside>
   )

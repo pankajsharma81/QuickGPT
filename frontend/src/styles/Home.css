@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: row;
   min-height: 100vh;
-  background: #212121;
+  background: #121212;
 }
 
 /* Header */
@@ -109,7 +109,7 @@
 }
 
 .chat-sidebar {
-  background: #171717;
+  background: #151515;
   border-right: 1px solid #262626;
   padding: var(--spacing-md) var(--spacing-sm);
   width: 280px;
@@ -245,43 +245,36 @@
   margin-top: auto;
   padding-top: var(--spacing-md);
   border-top: 1px solid #262626;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.sidebar-user {
+.sidebar-footer-item {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: 10px 12px;
+  padding: 8px 12px;
   border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #b3b3b3;
   cursor: pointer;
-  transition: background var(--transition-fast);
+  font-size: 12px;
+  text-align: left;
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
 
-.sidebar-user:hover {
+.sidebar-footer-item:hover {
   background: #262626;
-}
-
-.user-avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  background: #3a3a3a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-}
-
-.user-name {
-  color: #ececec;
-  font-size: var(--font-size-sm);
+  color: #ffffff;
 }
 
 .chat-screen {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: transparent;
+  background: #1c1c1c;
   border-radius: 0;
   border: none;
   overflow: hidden;
@@ -295,22 +288,107 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-md);
+  padding: 24px 16px 80px;
 }
 
-.welcome-logo {
-  width: 64px;
-  height: 64px;
+/* Start screen panel */
+.start-panel {
+  width: 100%;
+  max-width: 900px;
+  background: #1e1e1e;
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.45);
+}
+
+.start-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-bottom: 21px;
+}
+
+.start-logo-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 0, #4ade80, #22c55e 40%, #16a34a 80%);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ececec;
+  color: #020617;
 }
 
-.welcome-title {
+.start-title {
   font-size: 32px;
   font-weight: 600;
-  color: #ececec;
-  margin: 0;
+  color: #ffffff;
+}
+
+.start-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.start-column {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.start-column-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: #e5e5e5;
+}
+
+.start-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: #40414f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.start-column-title {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.start-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.start-card {
+  border-radius: 999px;
+  border: none;
+  background: #2e2f3a;
+  color: #e5e5e5;
+  padding: 0 16px;
+  font-size: 13px;
+  text-align: center;
+  min-height: 50px;
+  width: 80%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.start-card-text {
+  cursor: default;
 }
 
 .chat-screen-header {
@@ -375,9 +453,9 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: 8px 12px;
-  background: #2f2f2f;
-  border-radius: 24px;
+  padding: 10px 14px;
+  background: #202123;
+  border-radius: 999px;
   border: 1px solid #3a3a3a;
   max-width: 720px;
   width: 100%;
@@ -626,6 +704,16 @@
   .section-title {
     font-size: var(--font-size-2xl);
     margin-bottom: var(--spacing-3xl);
+  }
+
+  /* QuickGPT start screen: horizontal columns on larger screens */
+  .start-grid {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .start-column {
+    flex: 1;
   }
 
   .features-grid {
