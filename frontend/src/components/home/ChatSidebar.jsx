@@ -3,7 +3,7 @@ import { FiEdit, FiSun, FiExternalLink, FiLogOut, FiX } from 'react-icons/fi'
 import { IoChatbubbleOutline } from 'react-icons/io5'
 import { FaDiscord } from 'react-icons/fa'
 
-const ChatSidebar = ({ previousChats, activeChatId, onNewChat, onSelectChat, isOpen, onClose }) => {
+const ChatSidebar = ({ previousChats, activeChatId, onNewChat, onSelectChat, onLogout, isOpen, onClose }) => {
   return (
     <aside className={`chat-sidebar ${isOpen ? 'chat-sidebar-open' : ''}`}>
       {/* Mobile close button */}
@@ -52,7 +52,7 @@ const ChatSidebar = ({ previousChats, activeChatId, onNewChat, onSelectChat, isO
           <FiExternalLink size={16} className="sidebar-icon" />
           <span>Updates &amp; FAQ</span>
         </button>
-        <button className="sidebar-footer-item" type="button">
+        <button className="sidebar-footer-item" type="button" onClick={onLogout}>
           <FiLogOut size={16} className="sidebar-icon" />
           <span>Log out</span>
         </button>

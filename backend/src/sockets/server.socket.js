@@ -5,6 +5,7 @@ const UserModel = require("../models/user.model");
 const { generateResponse, generateVector } = require("../services/ai.service");
 const messageModel = require("../models/message.model");
 const { createMemory, queryMemory } = require("../services/vector.service");
+const ChatModel = require("../models/chat.model");
 
 function initSocketServer(httpServer) {
   const io = new Server(httpServer, {
@@ -61,6 +62,38 @@ function initSocketServer(httpServer) {
         }),
         generateVector(messagePayload.content),
       ]);
+
+      // If this chat has a placeholder title, set it from the first user prompt
+      if (messagePayload.chat) {
+        try {
+          const chat = await ChatModel.findById(messagePayload.chat);
+          if (chat && (!chat.title || chat.title === "New chat")) {
+            const text = messagePayload.content || "";
+            const trimmed = text.trim();
+            if (trimmed) {
+              chat.title =
+                trimmed.length > 30 ? `${trimmed.slice(0, 30)}…` : trimmed;
+              chat.lastActivity = new Date();
+              await chat.save();
+            }
+          }
+        } catch (err) {
+          console.error("QuickGPT socket set chat title error", err);
+        }
+      }
+
+      if (messagePayload.chat) {
+        try {
+          await ChatModel.findByIdAndUpdate(messagePayload.chat, {
+            lastActivity: new Date(),
+          });
+        } catch (err) {
+          console.error(
+            "QuickGPT socket update chat lastActivity error",
+            err
+          );
+        }
+      }
 
       await createMemory({
         vectors,

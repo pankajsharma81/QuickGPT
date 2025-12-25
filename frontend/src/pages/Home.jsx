@@ -4,6 +4,8 @@ import ChatSidebar from '../components/home/ChatSidebar'
 import ChatScreen from '../components/home/ChatScreen'
 import { getHistory, getChats, createChat } from '../api/chatApi'
 import { socket } from '../sockets/socketClient'
+import { logout as logoutApi } from '../api/authApi'
+import { useNavigate } from 'react-router-dom'
 
 const Home = () => {
   const [messages, setMessages] = useState([])
@@ -13,6 +15,7 @@ const Home = () => {
   const [isSending, setIsSending] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [error, setError] = useState('')
+  const navigate = useNavigate()
 
   useEffect(() => {
     const initChatsAndHistory = async () => {
@@ -96,6 +99,31 @@ const Home = () => {
     }
 
     setMessages((prev) => [...prev, userMessage])
+
+    // If this is the first user prompt and the chat title is still generic,
+    // update the local sidebar title immediately for a better UX.
+    setPreviousChats((prev) => {
+      if (!activeChatId) return prev
+
+      const updated = prev.map((chat) => {
+        if (chat.id !== activeChatId) return chat
+
+        const currentTitle = (chat.title || '').trim()
+        let nextTitle = chat.title
+
+        if (!currentTitle || currentTitle === 'New chat') {
+          nextTitle = trimmed.length > 30 ? `${trimmed.slice(0, 30)}…` : trimmed
+        }
+
+        return { ...chat, title: nextTitle }
+      })
+
+      const index = updated.findIndex((c) => c.id === activeChatId)
+      if (index <= 0) return updated
+
+      const [activeChat] = updated.splice(index, 1)
+      return [activeChat, ...updated]
+    })
     setUserInput('')
     setIsSending(true)
     setError('')
@@ -144,6 +172,19 @@ const Home = () => {
     create()
   }
 
+  const handleLogout = async () => {
+    try {
+      setError('')
+      await logoutApi()
+    } catch (err) {
+      console.error('QuickGPT logout error', err)
+    } finally {
+      // Clear any client-side auth remnants and go to login
+      localStorage.removeItem('quickgpt_token')
+      navigate('/login')
+    }
+  }
+
   const handleSelectChat = (chatId) => {
     setActiveChatId(chatId)
     setMessages([])
@@ -187,6 +228,7 @@ const Home = () => {
               handleSelectChat(chatId)
               setIsSidebarOpen(false)
             }}
+            onLogout={handleLogout}
             isOpen={isSidebarOpen}
             onClose={() => setIsSidebarOpen(false)}
           />
