@@ -15,11 +15,26 @@ async function createChat(req, res) {
       _id: chat._id,
       title: chat.title,
       lastActivity: chat.lastActivity,
-      user:chat.user
+      user: chat.user,
     },
   });
 }
 
-module.exports = {
-    createChat
+async function getChats(req, res) {
+  const user = req.user;
+  const chats = await ChatModel.find({ user: user._id });
+
+  res.status(200).json({
+    chats: chats.map((chat) => ({
+      _id: chat._id,
+      title: chat.title,
+      lastActivity: chat.lastActivity,
+      user: chat.user,
+    })),
+  });
 }
+
+module.exports = {
+  createChat,
+  getChats,
+};
