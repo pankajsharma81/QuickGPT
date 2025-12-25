@@ -21,19 +21,25 @@ async function createChat(req, res) {
 }
 
 async function getChats(req, res) {
-  const user = req.user;
-  const chats = await ChatModel.find({ user: user._id });
+  try {
+    const user = req.user;
+    const chats = await ChatModel.find({ user: user._id });
 
-  res.status(200).json({
-    chats: chats.map((chat) => ({
-      _id: chat._id,
-      title: chat.title,
-      lastActivity: chat.lastActivity,
-      user: chat.user,
-    })),
-  });
+    res.status(200).json({
+      chats: chats.map((chat) => ({
+        _id: chat._id,
+        title: chat.title,
+        lastActivity: chat.lastActivity,
+        user: chat.user,
+      })),
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to retrieve chats",
+      error: error.message,
+    });
+  }
 }
-
 module.exports = {
   createChat,
   getChats,
