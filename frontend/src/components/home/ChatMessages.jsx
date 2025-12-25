@@ -1,16 +1,49 @@
 import React from 'react'
+import { RiRobot2Line } from 'react-icons/ri'
+import { HiOutlineUser } from 'react-icons/hi'
 
 const ChatMessages = ({ messages }) => {
+  const formatTime = (value) => {
+    if (!value) return ''
+    const date = new Date(value)
+    if (Number.isNaN(date.getTime())) return ''
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  }
+
   return (
     <div className="chat-messages">
-      {messages.map((msg) => (
-        <div
-          key={msg.id}
-          className={`chat-message chat-message-${msg.sender}`}
-        >
-          <div className="chat-message-bubble">{msg.text}</div>
-        </div>
-      ))}
+      {messages.map((msg) => {
+        const isUser = msg.sender === 'user'
+        const time = formatTime(msg.timestamp || msg.createdAt)
+
+        return (
+          <div
+            key={msg.id}
+            className={`chat-message-row ${isUser ? 'chat-message-user' : 'chat-message-ai'}`}
+          >
+            {!isUser && (
+              <div className="chat-avatar chat-avatar-ai">
+                <RiRobot2Line size={18} />
+              </div>
+            )}
+
+            <div className="chat-bubble-wrapper">
+              <div className="chat-message-bubble">
+                {msg.text}
+              </div>
+              {time && (
+                <div className="chat-message-meta">{time}</div>
+              )}
+            </div>
+
+            {isUser && (
+              <div className="chat-avatar chat-avatar-user">
+                <HiOutlineUser size={18} />
+              </div>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }

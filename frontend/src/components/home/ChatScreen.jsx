@@ -1,6 +1,6 @@
 import React from 'react'
 import { RiRobot2Line } from 'react-icons/ri'
-import { FiMenu, FiSun, FiZap, FiAlertTriangle } from 'react-icons/fi'
+import { FiMenu, FiSun, FiZap, FiAlertTriangle, FiInfo, FiSettings } from 'react-icons/fi'
 import ChatMessages from './ChatMessages'
 import ChatInputBar from './ChatInputBar'
 
@@ -18,7 +18,15 @@ const ChatScreen = ({ messages, userInput, isSending, onChangeInput, onSend, onM
         // Chat view with messages
         <>
           <header className="chat-screen-header">
-            <span className="chat-title-name">QuickGPT</span>
+            <span className="chat-title-name">QuickGPT Conversation</span>
+            <div className="chat-header-actions">
+              <button className="chat-header-icon" type="button" aria-label="Conversation info">
+                <FiInfo size={16} />
+              </button>
+              <button className="chat-header-icon" type="button" aria-label="Settings">
+                <FiSettings size={16} />
+              </button>
+            </div>
           </header>
           <ChatMessages messages={messages} />
         </>
@@ -107,7 +115,7 @@ const ChatScreen = ({ messages, userInput, isSending, onChangeInput, onSend, onM
         isSending={isSending}
         onChange={onChangeInput}
         onSubmit={onSend}
-        placeholder={hasMessages ? "How can QuickGPT help?" : "What do you want to know?"}
+        placeholder="Send a message to AI…"
       />
     </section>
   )
