@@ -4,7 +4,7 @@ import { FiMenu, FiSun, FiZap, FiAlertTriangle, FiInfo, FiSettings } from 'react
 import ChatMessages from './ChatMessages'
 import ChatInputBar from './ChatInputBar'
 
-const ChatScreen = ({ messages, userInput, isSending, isGenerating, onChangeInput, onSend, onMenuClick, error }) => {
+const ChatScreen = ({ messages, userInput, isSending, isGenerating, isHistoryLoading, onChangeInput, onSend, onMenuClick, error }) => {
   const hasMessages = messages.length > 0
 
   return (
@@ -30,6 +30,18 @@ const ChatScreen = ({ messages, userInput, isSending, isGenerating, onChangeInpu
           </header>
           <ChatMessages messages={messages} isGenerating={isGenerating} />
         </>
+      ) : isHistoryLoading ? (
+        // Loading state while chat history is being fetched
+        <div className="welcome-view">
+          <div className="start-panel">
+            <div className="start-header">
+              <div className="start-logo-circle">
+                <RiRobot2Line size={32} />
+              </div>
+              <h1 className="start-title">Loading chat…</h1>
+            </div>
+          </div>
+        </div>
       ) : (
         // Landing view - QuickGPT start screen
         <div className="welcome-view">

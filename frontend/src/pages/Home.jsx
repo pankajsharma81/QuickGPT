@@ -15,6 +15,7 @@ const Home = () => {
   const [isSending, setIsSending] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isHistoryLoading, setIsHistoryLoading] = useState(false)
   const [error, setError] = useState('')
   const socketRef = useRef(null)
   const navigate = useNavigate()
@@ -23,6 +24,7 @@ const Home = () => {
     const initChatsAndHistory = async () => {
       try {
         setError('')
+        setIsHistoryLoading(true)
 
         const chatsData = await getChats()
         const chats = Array.isArray(chatsData?.chats) ? chatsData.chats : []
@@ -33,7 +35,7 @@ const Home = () => {
         }))
         setPreviousChats(mappedChats)
 
-        const firstChatId = mappedChats[0]?._id || mappedChats[0]?.id
+        const firstChatId = mappedChats[0]?.id
         if (firstChatId) {
           setActiveChatId(firstChatId)
 
@@ -42,7 +44,8 @@ const Home = () => {
             const mappedMessages = historyData.messages.map((m) => ({
               id: m.id,
               sender: m.role === 'model' ? 'ai' : 'user',
-              text: m.content
+              text: m.content,
+              createdAt: m.createdAt
             }))
             setMessages(mappedMessages)
           }
@@ -50,6 +53,8 @@ const Home = () => {
       } catch (err) {
         console.error('QuickGPT initial load error', err)
         setError('QuickGPT could not load your chats. Please try again.')
+      } finally {
+        setIsHistoryLoading(false)
       }
     }
 
@@ -147,6 +152,9 @@ const Home = () => {
         chat: activeChatId || undefined,
         content: trimmed
       })
+
+      // Message has been sent; keep isGenerating true until AI responds
+      setIsSending(false)
     } catch (err) {
       console.error('QuickGPT sendMessage error', err)
       setError('QuickGPT could not process your message. Please try again.')
@@ -156,7 +164,6 @@ const Home = () => {
         text: 'Sorry, something went wrong. Please try again.'
       }
       setMessages((prev) => [...prev, errorMessage])
-    } finally {
       setIsSending(false)
       setIsGenerating(false)
     }
@@ -207,18 +214,22 @@ const Home = () => {
     const loadHistoryForChat = async () => {
       try {
         setError('')
+        setIsHistoryLoading(true)
         const data = await getHistory(chatId)
         if (Array.isArray(data?.messages)) {
           const mapped = data.messages.map((m) => ({
             id: m.id,
             sender: m.role === 'model' ? 'ai' : 'user',
-            text: m.content
+            text: m.content,
+            createdAt: m.createdAt
           }))
           setMessages(mapped)
         }
       } catch (err) {
         console.error('QuickGPT getHistory error', err)
         setError('QuickGPT could not load this chat history.')
+      } finally {
+        setIsHistoryLoading(false)
       }
     }
 
@@ -253,6 +264,7 @@ const Home = () => {
             userInput={userInput}
             isSending={isSending}
             isGenerating={isGenerating}
+            isHistoryLoading={isHistoryLoading}
             onChangeInput={setUserInput}
             onSend={handleSendMessage}
             onMenuClick={toggleSidebar}

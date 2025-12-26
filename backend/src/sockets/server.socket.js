@@ -115,6 +115,7 @@ function initSocketServer(httpServer) {
         }),
         messageModel
           .find({
+            user: socket.user._id,
             chat: messagePayload.chat,
           })
           .sort({ createdAt: -1 })
