@@ -30,7 +30,7 @@ const Login = () => {
 
     try {
       await axios
-        .post("http://localhost:3000/api/auth/login", formData, {
+        .post("https://quickgpt-vsmt.onrender.com/api/auth/login", formData, {
           withCredentials: true,
         })
         .then((res) => {

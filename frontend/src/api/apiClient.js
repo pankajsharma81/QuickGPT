@@ -3,7 +3,7 @@ import axios from 'axios'
 const API_BASE_URL =
   import.meta.env.VITE_API_URL ||
   import.meta.env.NEXT_PUBLIC_API_URL ||
-  'http://localhost:3000'
+  'https://quickgpt-vsmt.onrender.com'
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

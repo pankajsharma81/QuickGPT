@@ -104,7 +104,7 @@ npm install
 Create a `.env` file in the [frontend](http://_vscodecontentref_/0) directory:
 
 ```
-VITE_API_URL=http://localhost:3000
+VITE_API_URL=https://quickgpt-vsmt.onrender.com
 ```
 
 ### ▶️ Running the App

@@ -33,7 +33,7 @@ const Register = () => {
     try {
       await axios
         .post(
-          "http://localhost:3000/api/auth/register",
+          "https://quickgpt-vsmt.onrender.com/api/auth/register",
           {
             email: formData.email,
             fullName: {

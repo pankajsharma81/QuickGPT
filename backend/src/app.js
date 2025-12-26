@@ -1,6 +1,7 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const path = require("path");
 
 // Routes
 const authRoutes = require("./routes/auth.routes");
@@ -19,9 +20,16 @@ app.use(
 app.use(express.json());
 // Middleware to parse cookies
 app.use(cookieParser());
+// Serve static files from the React frontend app
+app.use(express.static(path.join(__dirname, "../public")));
 
 // using Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/chat", chatRoutes);
+
+
+app.get("*name", (req, res) => {
+  res.sendFile(path.join(__dirname, "../public/index.html"));
+});
 
 module.exports = app;
