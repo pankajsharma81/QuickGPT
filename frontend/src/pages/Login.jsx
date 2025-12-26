@@ -35,6 +35,8 @@ const Login = () => {
         })
         .then((res) => {
           console.log(res);
+          // Store a simple flag/token so the frontend knows the user is authenticated
+          localStorage.setItem("quickgpt_token", "logged_in");
           navigate("/");
         })
         .catch((err) => {

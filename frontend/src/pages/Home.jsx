@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import '../styles/Home.css'
 import ChatSidebar from '../components/home/ChatSidebar'
 import ChatScreen from '../components/home/ChatScreen'
 import { getHistory, getChats, createChat } from '../api/chatApi'
-import { socket } from '../sockets/socketClient'
+import { getSocket } from '../sockets/socketClient'
 import { logout as logoutApi } from '../api/authApi'
 import { useNavigate } from 'react-router-dom'
 
@@ -16,6 +16,7 @@ const Home = () => {
   const [isGenerating, setIsGenerating] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [error, setError] = useState('')
+  const socketRef = useRef(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -56,6 +57,9 @@ const Home = () => {
   }, [])
 
   useEffect(() => {
+    const socket = getSocket()
+    socketRef.current = socket
+
     const handleAiResponse = (payload) => {
       const aiMessage = {
         id: Date.now(),
@@ -133,7 +137,13 @@ const Home = () => {
     setError('')
 
     try {
-      socket.emit('ai-message', {
+      if (!socketRef.current) {
+        console.error('QuickGPT socket not connected')
+        setError('QuickGPT could not connect. Please refresh and try again.')
+        return
+      }
+
+      socketRef.current.emit('ai-message', {
         chat: activeChatId || undefined,
         content: trimmed
       })
